@@ -22,7 +22,7 @@ namespace XRTK.Oculus.Controllers
             Handedness controllerHandedness,
             IMixedRealityInputSource inputSource = null,
             MixedRealityInteractionMapping[] interactions = null)
-            : base(trackingState, controllerHandedness, OculusApi.Controller.None, OculusApi.Node.None, inputSource, interactions)
+            : base(trackingState, controllerHandedness, OVRInput.Controller.None, OVRPlugin.Node.None, inputSource, interactions)
         {
         }
 

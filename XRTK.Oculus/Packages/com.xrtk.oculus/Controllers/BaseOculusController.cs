@@ -27,8 +27,8 @@ namespace XRTK.Oculus.Controllers
         public BaseOculusController(
             TrackingState trackingState,
             Handedness controllerHandedness,
-            OculusApi.Controller controllerType,
-            OculusApi.Node nodeType,
+            OVRInput.Controller controllerType,
+            OVRPlugin.Node nodeType,
             IMixedRealityInputSource inputSource = null,
             MixedRealityInteractionMapping[] interactions = null)
             : base(trackingState, controllerHandedness, inputSource, interactions)
@@ -40,15 +40,15 @@ namespace XRTK.Oculus.Controllers
         /// <summary>
         /// The Oculus Node Type.
         /// </summary>
-        public OculusApi.Node NodeType { get; }
+        public OVRPlugin.Node NodeType { get; }
 
         /// <summary>
         /// The Oculus Controller Type.
         /// </summary>
-        public OculusApi.Controller ControllerType { get; }
+        public OVRInput.Controller ControllerType { get; }
 
-        private OculusApi.ControllerState4 previousState = new OculusApi.ControllerState4();
-        private OculusApi.ControllerState4 currentState = new OculusApi.ControllerState4();
+        private OVRPlugin.ControllerState4 previousState = new OVRPlugin.ControllerState4();
+        private OVRPlugin.ControllerState4 currentState = new OVRPlugin.ControllerState4();
 
         /// <inheritdoc />
         public override MixedRealityInteractionMapping[] DefaultInteractions => new[]
@@ -171,75 +171,75 @@ namespace XRTK.Oculus.Controllers
             lastControllerPose = currentControllerPose;
             previousState = currentState;
 
-            currentState = OculusApi.GetControllerState4((uint)ControllerType);
+            currentState = OVRPlugin.GetControllerState4((uint)ControllerType);
 
             if (currentState.LIndexTrigger >= OculusApi.AXIS_AS_BUTTON_THRESHOLD)
             {
-                currentState.Buttons |= (uint)OculusApi.RawButton.LIndexTrigger;
+                currentState.Buttons |= (uint)OVRInput.RawButton.LIndexTrigger;
             }
 
             if (currentState.LHandTrigger >= OculusApi.AXIS_AS_BUTTON_THRESHOLD)
             {
-                currentState.Buttons |= (uint)OculusApi.RawButton.LHandTrigger;
+                currentState.Buttons |= (uint)OVRInput.RawButton.LHandTrigger;
             }
 
             if (currentState.LThumbstick.y >= OculusApi.AXIS_AS_BUTTON_THRESHOLD)
             {
-                currentState.Buttons |= (uint)OculusApi.RawButton.LThumbstickUp;
+                currentState.Buttons |= (uint)OVRInput.RawButton.LThumbstickUp;
             }
 
             if (currentState.LThumbstick.y <= -OculusApi.AXIS_AS_BUTTON_THRESHOLD)
             {
-                currentState.Buttons |= (uint)OculusApi.RawButton.LThumbstickDown;
+                currentState.Buttons |= (uint)OVRInput.RawButton.LThumbstickDown;
             }
 
             if (currentState.LThumbstick.x <= -OculusApi.AXIS_AS_BUTTON_THRESHOLD)
             {
-                currentState.Buttons |= (uint)OculusApi.RawButton.LThumbstickLeft;
+                currentState.Buttons |= (uint)OVRInput.RawButton.LThumbstickLeft;
             }
 
             if (currentState.LThumbstick.x >= OculusApi.AXIS_AS_BUTTON_THRESHOLD)
             {
-                currentState.Buttons |= (uint)OculusApi.RawButton.LThumbstickRight;
+                currentState.Buttons |= (uint)OVRInput.RawButton.LThumbstickRight;
             }
 
             if (currentState.RIndexTrigger >= OculusApi.AXIS_AS_BUTTON_THRESHOLD)
             {
-                currentState.Buttons |= (uint)OculusApi.RawButton.RIndexTrigger;
+                currentState.Buttons |= (uint)OVRInput.RawButton.RIndexTrigger;
             }
 
             if (currentState.RHandTrigger >= OculusApi.AXIS_AS_BUTTON_THRESHOLD)
             {
-                currentState.Buttons |= (uint)OculusApi.RawButton.RHandTrigger;
+                currentState.Buttons |= (uint)OVRInput.RawButton.RHandTrigger;
             }
 
             if (currentState.RThumbstick.y >= OculusApi.AXIS_AS_BUTTON_THRESHOLD)
             {
-                currentState.Buttons |= (uint)OculusApi.RawButton.RThumbstickUp;
+                currentState.Buttons |= (uint)OVRInput.RawButton.RThumbstickUp;
             }
 
             if (currentState.RThumbstick.y <= -OculusApi.AXIS_AS_BUTTON_THRESHOLD)
             {
-                currentState.Buttons |= (uint)OculusApi.RawButton.RThumbstickDown;
+                currentState.Buttons |= (uint)OVRInput.RawButton.RThumbstickDown;
             }
 
             if (currentState.RThumbstick.x <= -OculusApi.AXIS_AS_BUTTON_THRESHOLD)
             {
-                currentState.Buttons |= (uint)OculusApi.RawButton.RThumbstickLeft;
+                currentState.Buttons |= (uint)OVRInput.RawButton.RThumbstickLeft;
             }
 
             if (currentState.RThumbstick.x >= OculusApi.AXIS_AS_BUTTON_THRESHOLD)
             {
-                currentState.Buttons |= (uint)OculusApi.RawButton.RThumbstickRight;
+                currentState.Buttons |= (uint)OVRInput.RawButton.RThumbstickRight;
             }
 
             if (IsTrackedController(ControllerType))
             {
                 // The source is either a hand or a controller that supports pointing.
                 // We can now check for position and rotation.
-                IsPositionAvailable = OculusApi.GetNodePositionTracked(NodeType);
-                IsPositionApproximate = IsPositionAvailable && OculusApi.GetNodePositionValid(NodeType);
-                IsRotationAvailable = OculusApi.GetNodeOrientationTracked(NodeType);
+                IsPositionAvailable = OVRPlugin.GetNodePositionTracked(NodeType);
+                IsPositionApproximate = IsPositionAvailable && OVRPlugin.GetNodePositionValid(NodeType);
+                IsRotationAvailable = OVRPlugin.GetNodeOrientationTracked(NodeType);
 
                 // Devices are considered tracked if we receive position OR rotation data from the sensors.
                 TrackingState = (IsPositionAvailable || IsRotationAvailable) ? TrackingState.Tracked : TrackingState.NotTracked;
@@ -250,7 +250,7 @@ namespace XRTK.Oculus.Controllers
                 TrackingState = TrackingState.NotApplicable;
             }
 
-            currentControllerPose = OculusApi.GetNodePose(NodeType, OculusApi.stepType).ToMixedRealityPose(true);
+            currentControllerPose = OVRPlugin.GetNodePose(NodeType, OVRPlugin.Step.Render).ToMixedRealityPose(true);
 
             // Raise input system events if it is enabled.
             if (lastState != TrackingState)
@@ -275,30 +275,30 @@ namespace XRTK.Oculus.Controllers
             }
         }
 
-        private static bool IsTrackedController(OculusApi.Controller controller)
+        private static bool IsTrackedController(OVRInput.Controller controller)
         {
-            return controller == OculusApi.Controller.Touch ||
-                   controller == OculusApi.Controller.LTouch ||
-                   controller == OculusApi.Controller.RTouch ||
-                   controller == OculusApi.Controller.LTrackedRemote ||
-                   controller == OculusApi.Controller.RTrackedRemote;
+            return controller == OVRInput.Controller.Touch ||
+                   controller == OVRInput.Controller.LTouch ||
+                   controller == OVRInput.Controller.RTouch ||
+                   controller == OVRInput.Controller.LTrackedRemote ||
+                   controller == OVRInput.Controller.RTrackedRemote;
         }
 
         private void UpdateButtonDataPress(MixedRealityInteractionMapping interactionMapping)
         {
             Debug.Assert(interactionMapping.AxisType == AxisType.Digital);
 
-            Enum.TryParse<OculusApi.RawButton>(interactionMapping.InputName, out var interactionButton);
+            Enum.TryParse<OVRInput.RawButton>(interactionMapping.InputName, out var interactionButton);
 
-            if (interactionButton != OculusApi.RawButton.None)
+            if (interactionButton != OVRInput.RawButton.None)
             {
-                if (((OculusApi.RawButton)previousState.Buttons & interactionButton) != 0)
+                if (((OVRInput.RawButton)previousState.Buttons & interactionButton) != 0)
                 {
                     interactionMapping.BoolData = false;
                 }
 
-                if (((OculusApi.RawButton)currentState.Buttons & interactionButton) != 0 &&
-                    ((OculusApi.RawButton)previousState.Buttons & interactionButton) == 0)
+                if (((OVRInput.RawButton)currentState.Buttons & interactionButton) != 0 &&
+                    ((OVRInput.RawButton)previousState.Buttons & interactionButton) == 0)
                 {
                     interactionMapping.BoolData = true;
                 }
@@ -309,17 +309,17 @@ namespace XRTK.Oculus.Controllers
         {
             Debug.Assert(interactionMapping.AxisType == AxisType.Digital);
 
-            Enum.TryParse<OculusApi.RawTouch>(interactionMapping.InputName, out var interactionButton);
+            Enum.TryParse<OVRInput.RawTouch>(interactionMapping.InputName, out var interactionButton);
 
-            if (interactionButton != OculusApi.RawTouch.None)
+            if (interactionButton != OVRInput.RawTouch.None)
             {
-                if (((OculusApi.RawTouch)previousState.Touches & interactionButton) != 0)
+                if (((OVRInput.RawTouch)previousState.Touches & interactionButton) != 0)
                 {
                     interactionMapping.BoolData = false;
                 }
 
-                if (((OculusApi.RawTouch)currentState.Touches & interactionButton) != 0 &&
-                    ((OculusApi.RawTouch)previousState.Touches & interactionButton) == 0)
+                if (((OVRInput.RawTouch)currentState.Touches & interactionButton) != 0 &&
+                    ((OVRInput.RawTouch)previousState.Touches & interactionButton) == 0)
                 {
                     interactionMapping.BoolData = true;
                 }
@@ -330,17 +330,17 @@ namespace XRTK.Oculus.Controllers
         {
             Debug.Assert(interactionMapping.AxisType == AxisType.Digital);
 
-            Enum.TryParse<OculusApi.RawNearTouch>(interactionMapping.InputName, out var interactionButton);
+            Enum.TryParse<OVRInput.RawNearTouch>(interactionMapping.InputName, out var interactionButton);
 
-            if (interactionButton != OculusApi.RawNearTouch.None)
+            if (interactionButton != OVRInput.RawNearTouch.None)
             {
-                if (((OculusApi.RawNearTouch)previousState.NearTouches & interactionButton) != 0)
+                if (((OVRInput.RawNearTouch)previousState.NearTouches & interactionButton) != 0)
                 {
                     interactionMapping.BoolData = false;
                 }
 
-                if (((OculusApi.RawNearTouch)currentState.NearTouches & interactionButton) != 0 &&
-                    ((OculusApi.RawNearTouch)previousState.NearTouches & interactionButton) == 0)
+                if (((OVRInput.RawNearTouch)currentState.NearTouches & interactionButton) != 0 &&
+                    ((OVRInput.RawNearTouch)previousState.NearTouches & interactionButton) == 0)
                 {
                     interactionMapping.BoolData = true;
                 }
@@ -351,28 +351,28 @@ namespace XRTK.Oculus.Controllers
         {
             Debug.Assert(interactionMapping.AxisType == AxisType.SingleAxis);
 
-            Enum.TryParse<OculusApi.RawAxis1D>(interactionMapping.InputName, out var interactionAxis1D);
+            Enum.TryParse<OVRInput.RawAxis1D>(interactionMapping.InputName, out var interactionAxis1D);
 
-            if (interactionAxis1D != OculusApi.RawAxis1D.None)
+            if (interactionAxis1D != OVRInput.RawAxis1D.None)
             {
                 switch (interactionAxis1D)
                 {
-                    case OculusApi.RawAxis1D.LIndexTrigger:
+                    case OVRInput.RawAxis1D.LIndexTrigger:
                         singleAxisValue = currentState.LIndexTrigger;
 
                         singleAxisValue = OculusApi.CalculateAbsMax(0, singleAxisValue);
                         break;
-                    case OculusApi.RawAxis1D.LHandTrigger:
+                    case OVRInput.RawAxis1D.LHandTrigger:
                         singleAxisValue = currentState.LHandTrigger;
 
                         singleAxisValue = OculusApi.CalculateAbsMax(0, singleAxisValue);
                         break;
-                    case OculusApi.RawAxis1D.RIndexTrigger:
+                    case OVRInput.RawAxis1D.RIndexTrigger:
                         singleAxisValue = currentState.RIndexTrigger;
 
                         singleAxisValue = OculusApi.CalculateAbsMax(0, singleAxisValue);
                         break;
-                    case OculusApi.RawAxis1D.RHandTrigger:
+                    case OVRInput.RawAxis1D.RHandTrigger:
 
                         singleAxisValue = currentState.RHandTrigger;
 
@@ -389,31 +389,31 @@ namespace XRTK.Oculus.Controllers
         {
             Debug.Assert(interactionMapping.AxisType == AxisType.DualAxis);
 
-            Enum.TryParse<OculusApi.RawAxis2D>(interactionMapping.InputName, out var interactionAxis2D);
+            Enum.TryParse<OVRInput.RawAxis2D>(interactionMapping.InputName, out var interactionAxis2D);
 
-            if (interactionAxis2D != OculusApi.RawAxis2D.None)
+            if (interactionAxis2D != OVRInput.RawAxis2D.None)
             {
                 switch (interactionAxis2D)
                 {
-                    case OculusApi.RawAxis2D.LThumbstick:
+                    case OVRInput.RawAxis2D.LThumbstick:
                         dualAxisPosition.x = currentState.LThumbstick.x;
                         dualAxisPosition.y = currentState.LThumbstick.y;
 
                         dualAxisPosition = OculusApi.CalculateAbsMax(Vector2.zero, dualAxisPosition);
                         break;
-                    case OculusApi.RawAxis2D.LTouchpad:
+                    case OVRInput.RawAxis2D.LTouchpad:
                         dualAxisPosition.x = currentState.LTouchpad.x;
                         dualAxisPosition.y = currentState.LTouchpad.y;
 
                         dualAxisPosition = OculusApi.CalculateAbsMax(Vector2.zero, dualAxisPosition);
                         break;
-                    case OculusApi.RawAxis2D.RThumbstick:
+                    case OVRInput.RawAxis2D.RThumbstick:
                         dualAxisPosition.x = currentState.RThumbstick.x;
                         dualAxisPosition.y = currentState.RThumbstick.y;
 
                         dualAxisPosition = OculusApi.CalculateAbsMax(Vector2.zero, dualAxisPosition);
                         break;
-                    case OculusApi.RawAxis2D.RTouchpad:
+                    case OVRInput.RawAxis2D.RTouchpad:
                         dualAxisPosition.x = currentState.RTouchpad.x;
                         dualAxisPosition.y = currentState.RTouchpad.y;
 
